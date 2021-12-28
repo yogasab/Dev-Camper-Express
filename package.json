@@ -1,16 +1,21 @@
 {
 	"name": "dev-camper-express",
 	"version": "1.0.0",
-	"description": "",
+	"description": "Devcamper Express Backend API",
 	"main": "server.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "nodemon server"
+		"dev": "nodemon server",
+		"start": "NODE_ENV=production node server"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"dotenv": "^10.0.0",
+		"express": "^4.17.2",
 		"nodemon": "^2.0.15"
+	},
+	"dependencies": {
+		"win-node-env": "^0.6.0"
 	}
 }
