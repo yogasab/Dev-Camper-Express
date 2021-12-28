@@ -5,7 +5,7 @@
 	"main": "server.js",
 	"scripts": {
 		"dev": "nodemon server",
-		"start": "NODE_ENV=production node server"
+		"prod": "NODE_ENV=production node server"
 	},
 	"keywords": [],
 	"author": "",
@@ -16,6 +16,7 @@
 		"nodemon": "^2.0.15"
 	},
 	"dependencies": {
+		"morgan": "^1.10.0",
 		"win-node-env": "^0.6.0"
 	}
 }
