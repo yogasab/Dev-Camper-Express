@@ -11,7 +11,7 @@ exports.createBootcamp = async (req, res, next) => {
 		const data = await Bootcamp.create(bootcamp);
 		res.status(201).json({ success: true, data: data });
 	} catch (error) {
-		res.status(400).json({ success: false, data: error.message });
+		next(error);
 	}
 };
 
@@ -27,7 +27,7 @@ exports.getBootcamps = async (req, res, next) => {
 			data: bootcamps,
 		});
 	} catch (error) {
-		res.status(400).json({ success: false, message: error.message });
+		next(error);
 	}
 };
 
@@ -48,8 +48,7 @@ exports.getBootcamp = async (req, res, next) => {
 			data: bootcamp,
 		});
 	} catch (error) {
-		// res.status(404).json({ success: false });
-		next(new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`));
+		next(error);
 	}
 };
 
@@ -71,7 +70,7 @@ exports.updateBootcamp = async (req, res, next) => {
 			data: bootcamp,
 		});
 	} catch (error) {
-		res.status(404).json({ success: false });
+		next(error);
 	}
 };
 
