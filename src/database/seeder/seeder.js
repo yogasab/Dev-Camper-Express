@@ -2,6 +2,8 @@ const fs = require("fs");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const Bootcamp = require("../../app/Model/Bootcamp");
+const Course = require("../../app/Model/Course");
+const { CONNREFUSED } = require("dns");
 
 const path = "../../../config/config.env";
 // require("../../../data/bootcamps.js");
@@ -16,10 +18,12 @@ mongoose.connect("mongodb://127.0.0.1:27017/dev-camper-express", {
 
 // Read JSON Files
 const bootcamps = JSON.parse(fs.readFileSync("../../../data/bootcamps.json"));
+const courses = JSON.parse(fs.readFileSync("../../../data/courses.json"));
 
 const importData = async () => {
 	try {
 		await Bootcamp.create(bootcamps);
+		await Course.create(courses);
 		console.log("Data Imported...");
 		process.exit();
 	} catch (error) {
@@ -31,6 +35,7 @@ const importData = async () => {
 const deleteData = async () => {
 	try {
 		await Bootcamp.deleteMany();
+		await Course.deleteMany();
 		console.log("Data deleted...");
 		process.exit();
 	} catch (error) {
