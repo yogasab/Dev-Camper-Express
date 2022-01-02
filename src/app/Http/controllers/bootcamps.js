@@ -17,13 +17,40 @@ exports.createBootcamp = asyncMiddleware(async (req, res, next) => {
 // @access  Public
 exports.getBootcamps = asyncMiddleware(async (req, res, next) => {
 	let query;
+
+	// Grab all the query params object
+	const reqQuery = { ...req.query };
+	// Define select query key object to modify
+	const removedFields = ["select", "sort", "limit", "page"];
+	// Delete each key on select array to grab the value only
+	removedFields.forEach((param) => delete reqQuery[param]);
+	// Create query string
 	let queryStr = JSON.stringify(req.query);
+
+	// Create separators (gt|gte|lt|lte|in)
 	queryStr = queryStr.replace(
 		/\b(gt|gte|lt|lte|in)\b/g,
 		(match) => `$${match}`
 	);
 
+	// Finding resource
 	query = Bootcamp.find(JSON.parse(queryStr));
+	// Select fields
+	if (req.query.select) {
+		const fields = req.query.select.split(",").join(" ");
+		query = query.select(fields);
+	}
+
+	// Sort fields
+	if (req.query.sort) {
+		const fields = req.query.sort.split(",").join(" ");
+		query = query.sort(fields);
+	} else {
+		query = query.sort("-createdAt");
+	}
+
+	
+	// Executing query
 	const bootcamps = await query;
 
 	res.status(200).json({
