@@ -34,7 +34,10 @@ exports.getBootcamps = asyncMiddleware(async (req, res, next) => {
 	);
 
 	// Finding resource
-	query = Bootcamp.find(JSON.parse(queryStr));
+	query = Bootcamp.find(JSON.parse(queryStr)).populate({
+		path: "courses",
+		select: "title description",
+	});
 	// Select fields
 	if (req.query.select) {
 		const fields = req.query.select.split(",").join(" ");
@@ -125,10 +128,15 @@ exports.updateBootcamp = asyncMiddleware(async (req, res, next) => {
 // @access  Private
 exports.deleteBootcamp = asyncMiddleware(async (req, res, next) => {
 	const { id } = req.params;
-	const bootcamp = await Bootcamp.findByIdAndDelete(id);
+	// const bootcamp = await Bootcamp.findByIdAndDelete(id);
+	const bootcamp = await Bootcamp.findById(id);
+
 	if (!bootcamp) {
 		return res.status(400).json({ success: false });
 	}
+
+	bootcamp.remove();
+
 	res.status(204).json({
 		success: true,
 		message: "Bootcamp deleted successfully",
