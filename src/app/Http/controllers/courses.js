@@ -82,9 +82,9 @@ exports.deleteCourse = asyncMiddleware(async (req, res, next) => {
 
 	let course = await Course.findById(id);
 	if (!course) {
-		new ErrorResponse(`Course not found with id of ${id}`);
+		return next(new ErrorResponse(`Course not found with id of ${id}`));
 	}
-	course.remove();
+	await course.remove();
 
 	res.status(204).json({ success: true });
 });
