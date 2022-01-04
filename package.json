@@ -17,6 +17,7 @@
 		"nodemon": "^2.0.15"
 	},
 	"dependencies": {
+		"express-fileupload": "^1.2.1",
 		"morgan": "^1.10.0",
 		"node-geocoder": "^3.28.0",
 		"slugify": "^1.6.4",

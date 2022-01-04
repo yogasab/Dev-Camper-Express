@@ -1,9 +1,11 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const morgan = require("morgan");
+const fileUpload = require("express-fileupload");
+const path = require("path");
 const bootcamps = require("./src/routes/bootcamps");
 const courses = require("./src/routes/courses");
 const handleError = require("./src/app/Http/middleware/handleError");
-const morgan = require("morgan");
 const connectDB = require("./config/db");
 
 dotenv.config({ path: "./config/config.env" });
@@ -17,6 +19,8 @@ if (process.env.NODE_ENV === "development") {
 connectDB();
 
 app.use(express.json());
+app.use(fileUpload());
+app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
 // Handle Error Middleware
