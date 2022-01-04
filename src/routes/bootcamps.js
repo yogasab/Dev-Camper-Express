@@ -11,11 +11,20 @@ const {
 const router = express.Router();
 // Include others resource routers
 const courseRouter = require("./courses");
+const Bootcamp = require("../app/Model/Bootcamp");
+const advanceResponseMiddleware = require("../app/Http/middleware/advanceResponseMiddleware");
 
 router.use("/:bootcampId/courses", courseRouter);
+
 router.route("/radius/:zipcode/:distance").get(getBootcampsByRadius);
+
 router.route("/:id/photo").put(uploadBootcampPhoto);
-router.route("/").get(getBootcamps).post(createBootcamp);
+
+router
+	.route("/")
+	.get(advanceResponseMiddleware(Bootcamp, "courses"), getBootcamps)
+	.post(createBootcamp);
+
 router
 	.route("/:id")
 	.get(getBootcamp)

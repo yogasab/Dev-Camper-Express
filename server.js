@@ -5,6 +5,7 @@ const fileUpload = require("express-fileupload");
 const path = require("path");
 const bootcamps = require("./src/routes/bootcamps");
 const courses = require("./src/routes/courses");
+const auth = require("./src/routes/auth");
 const handleError = require("./src/app/Http/middleware/handleError");
 const connectDB = require("./config/db");
 
@@ -23,6 +24,7 @@ app.use(fileUpload());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
+app.use("/api/v1/auth", auth);
 // Handle Error Middleware
 app.use(handleError);
 

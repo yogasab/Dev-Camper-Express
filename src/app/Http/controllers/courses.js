@@ -8,22 +8,14 @@ const Bootcamp = require("../../Model/Bootcamp");
 // @route   GET /api/v1/bootcamps/:bootcampId/courses
 // @access  Private
 exports.getCourses = asyncMiddleware(async (req, res, next) => {
-	let query;
-
 	if (req.params.bootcampId) {
-		query = Course.find({ bootcamp: req.params.bootcampId });
+		const courses = await Course.find({ bootcamp: req.params.bootcampId });
+		res
+			.status(200)
+			.json({ success: true, totalCourses: courses.length, data: courses });
 	} else {
-		// Defining the relationship
-		query = Course.find().populate({
-			path: "bootcamp",
-			select: "name description",
-		});
+		res.status(200).json(res.advanceResponseMiddleware);
 	}
-	const courses = await query;
-
-	res
-		.status(200)
-		.json({ success: true, totalCourses: courses.length, data: courses });
 });
 
 // @decs    Get single course
