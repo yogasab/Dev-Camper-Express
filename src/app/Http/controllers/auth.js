@@ -15,9 +15,10 @@ exports.register = asyncMiddleware(async (req, res, next) => {
 		role,
 	});
 
-	const token = user.getSignedJWTToken();
+	sendTokenResponse(user, 200, res);
 
-	res.status(201).json({ success: true, data: user, token });
+	// const token = user.getSignedJWTToken();
+	// res.status(201).json({ success: true, data: user, token });
 });
 
 // @decs    Create/Store registered user
@@ -37,9 +38,30 @@ exports.login = asyncMiddleware(async (req, res, next) => {
 	if (!isPasswordMatch) {
 		return next(new ErrorResponse("Invalid credentials", 401));
 	}
+
+	sendTokenResponse(user, 200, res);
+	// const token = user.getSignedJWTToken();
+	// res
+	// 	.status(200)
+	// 	.json({ success: true, message: "User logged in successfully", token });
+});
+
+const sendTokenResponse = (user, statusCode, res) => {
 	const token = user.getSignedJWTToken();
 
+	const options = {
+		expires: new Date(
+			Date.now() + process.env.TOKEN_COOKIE_EXPIRES_IN * 24 * 3600 * 1000
+		),
+		httpOnly: true,
+	};
+
+	if (process.env.NODE_ENV === "production") {
+		options.secure = true;
+	}
+
 	res
-		.status(200)
-		.json({ success: true, message: "User logged in successfully", token });
-});
+		.status(statusCode)
+		.cookie("cookie", token, options)
+		.json({ success: true, token });
+};
