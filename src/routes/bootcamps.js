@@ -13,6 +13,7 @@ const router = express.Router();
 const courseRouter = require("./courses");
 const Bootcamp = require("../app/Model/Bootcamp");
 const advanceResponseMiddleware = require("../app/Http/middleware/advanceResponseMiddleware");
+const { protect } = require("../app/Http/middleware/auth");
 
 router.use("/:bootcampId/courses", courseRouter);
 
@@ -23,12 +24,12 @@ router.route("/:id/photo").put(uploadBootcampPhoto);
 router
 	.route("/")
 	.get(advanceResponseMiddleware(Bootcamp, "courses"), getBootcamps)
-	.post(createBootcamp);
+	.post(protect, createBootcamp);
 
 router
 	.route("/:id")
 	.get(getBootcamp)
 	.put(updateBootcamp)
-	.delete(deleteBootcamp);
+	.delete(protect, deleteBootcamp);
 
 module.exports = router;

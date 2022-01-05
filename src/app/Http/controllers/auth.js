@@ -46,6 +46,16 @@ exports.login = asyncMiddleware(async (req, res, next) => {
 	// 	.json({ success: true, message: "User logged in successfully", token });
 });
 
+// @decs    Get the current user profile
+// @route   GET /api/v1/auth/me
+// @access  Private
+exports.getProfile = asyncMiddleware(async (req, res, next) => {
+	console.log(req.user);
+	const user = await User.findById(req.user.id);
+
+	res.status(200).json({ success: true, data: user });
+});
+
 const sendTokenResponse = (user, statusCode, res) => {
 	const token = user.getSignedJWTToken();
 
