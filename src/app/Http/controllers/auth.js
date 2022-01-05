@@ -15,5 +15,7 @@ exports.register = asyncMiddleware(async (req, res, next) => {
 		role,
 	});
 
-	res.status(201).json({ success: true, data: user });
+	const token = user.getSignedJWTToken();
+
+	res.status(201).json({ success: true, data: user, token });
 });
