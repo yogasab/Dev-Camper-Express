@@ -26,3 +26,17 @@ exports.protect = asyncMiddleware(async (req, res, next) => {
 
 	next();
 });
+
+exports.authorize = (...roles) => {
+	return (req, res, next) => {
+		if (!roles.includes(req.user.role)) {
+			return next(
+				new ErrorResponse(
+					`User role ${req.user.role} is not authorize to access this route`,
+					403
+				)
+			);
+		}
+		next();
+	};
+};
