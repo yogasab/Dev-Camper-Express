@@ -20,7 +20,7 @@ router
 		}),
 		getCourses
 	)
-	.post(protect, authorize("publisher", "admin"), createCourse);
+	.post(protect, createCourse);
 
 router
 	.route("/:id")

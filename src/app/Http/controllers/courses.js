@@ -38,10 +38,19 @@ exports.getCourse = asyncMiddleware(async (req, res, next) => {
 exports.createCourse = asyncMiddleware(async (req, res, next) => {
 	const { bootcampId } = req.params;
 	req.body.bootcamp = bootcampId;
+	req.body.user = req.user.id;
 
 	const bootcamp = await Bootcamp.findById(bootcampId);
 	if (!bootcamp) {
 		return next(new ErrorResponse(`Bootcamp not found`), 404);
+	}
+	if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+		return next(
+			new ErrorResponse(
+				`User with id ${req.user.id} is not authorized to add course to this bootcamp`,
+				401
+			)
+		);
 	}
 	const course = await Course.create(req.body);
 
@@ -57,6 +66,14 @@ exports.updateCourse = asyncMiddleware(async (req, res, next) => {
 	let course = await Course.findById(id);
 	if (!course) {
 		return next(new ErrorResponse(`Course not found`), 404);
+	}
+	if (course.user.toString() !== req.user && req.user.role !== "admin") {
+		return next(
+			new ErrorResponse(
+				`User with id ${req.user.id} is not authorized to update course to this bootcamp`,
+				401
+			)
+		);
 	}
 	course = await Course.findByIdAndUpdate(id, req.body, {
 		new: true,
@@ -75,6 +92,14 @@ exports.deleteCourse = asyncMiddleware(async (req, res, next) => {
 	let course = await Course.findById(id);
 	if (!course) {
 		return next(new ErrorResponse(`Course not found with id of ${id}`));
+	}
+	if (course.user.toString() !== req.user.id && req.user.role !== "admin") {
+		return next(
+			new ErrorResponse(
+				`User with id ${req.user.id} is not authorized to update course to this bootcamp`,
+				401
+			)
+		);
 	}
 	await course.remove();
 
