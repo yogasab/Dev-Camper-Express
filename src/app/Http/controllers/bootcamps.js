@@ -53,13 +53,25 @@ exports.getBootcamp = asyncMiddleware(async (req, res, next) => {
 // @access  Private
 exports.updateBootcamp = asyncMiddleware(async (req, res, next) => {
 	const { id } = req.params;
-	const bootcamp = await Bootcamp.findByIdAndUpdate(id, req.body, {
+
+	let bootcamp = await Bootcamp.findById(id);
+	console.log(bootcamp.user);
+	if (!bootcamp) {
+		return next(new ErrorResponse(`Bootcamp not found`, 404));
+	}
+	if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+		return next(
+			new ErrorResponse(
+				`User ${req.user.id} is not authorized to updated this bootcamp`,
+				401
+			)
+		);
+	}
+	bootcamp = await Bootcamp.findByIdAndUpdate(id, req.body, {
 		new: true,
 		runValidators: true,
 	});
-	if (!bootcamp) {
-		return res.status(400).json({ success: false });
-	}
+
 	res.status(200).json({
 		success: true,
 		data: bootcamp,
@@ -71,13 +83,19 @@ exports.updateBootcamp = asyncMiddleware(async (req, res, next) => {
 // @access  Private
 exports.deleteBootcamp = asyncMiddleware(async (req, res, next) => {
 	const { id } = req.params;
-	// const bootcamp = await Bootcamp.findByIdAndDelete(id);
+
 	const bootcamp = await Bootcamp.findById(id);
-
 	if (!bootcamp) {
-		return res.status(400).json({ success: false });
+		return next(new ErrorResponse(`Bootcamp not found`, 404));
 	}
-
+	if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+		return next(
+			new ErrorResponse(
+				`User ${req.user.id} is not authorized to updated this bootcamp`,
+				401
+			)
+		);
+	}
 	bootcamp.remove();
 
 	res.status(204).json({
@@ -121,6 +139,14 @@ exports.uploadBootcampPhoto = asyncMiddleware(async (req, res, next) => {
 	}
 	if (!req.files) {
 		return next(new ErrorResponse(`Please upload a file`, 400));
+	}
+	if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+		return next(
+			new ErrorResponse(
+				`User ${req.user.id} is not authorized to updated this bootcamp`,
+				401
+			)
+		);
 	}
 	const file = req.files.photo;
 	if (!file.mimetype.startsWith("image")) {
