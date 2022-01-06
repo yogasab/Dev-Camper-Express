@@ -1,6 +1,7 @@
 const ErrorResponse = require("../../../utils/ErrorResponse");
 const asyncMiddleware = require("../middleware/asyncMiddleware");
 const User = require("../../Model/User");
+const sendEmail = require("../../../utils/SendEmail");
 
 // @decs    Create/Store new user
 // @route   POST /api/v1/auth/register
@@ -67,7 +68,31 @@ exports.forgotPassword = asyncMiddleware(async (req, res, next) => {
 		return next(new ErrorResponse(`User with email ${email} not found`, 404));
 	}
 
+	// Create reset password
 	const resetPasswordToken = user.getResetPassword();
+	// Create reset URL
+	const resetURL = `${req.protocol}://${req.get(
+		"host"
+	)}/api/v1/auth/forgot-password/${resetPasswordToken}`;
+	const message = `Your reset password is ${resetURL}`;
+
+	try {
+		await sendEmail({
+			email: user.email,
+			subject: "Password reset token",
+			message,
+		});
+
+		res.status(200).json({ success: true, message: "Email sent successfully" });
+	} catch (error) {
+		console.log(error);
+
+		user.resetPasswordToken = undefined;
+		user.resetPasswordToken = undefined;
+		await user.save({ validateBeforeSave: false });
+
+		return next(new ErrorResponse(`Email could not be send`, 500));
+	}
 
 	await user.save({ validateBeforeSave: false });
 
