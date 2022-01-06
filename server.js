@@ -8,9 +8,9 @@ const bootcamps = require("./src/routes/bootcamps");
 const courses = require("./src/routes/courses");
 const auth = require("./src/routes/auth");
 const handleError = require("./src/app/Http/middleware/handleError");
-const connectDB = require("./config/db");
+const connectDB = require("./env/db");
 
-dotenv.config({ path: "./config/config.env" });
+dotenv.config({ path: "./env/config.env" });
 
 const app = express();
 const PORT = process.env.PORT;

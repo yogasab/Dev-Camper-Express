@@ -56,6 +56,24 @@ exports.getProfile = asyncMiddleware(async (req, res, next) => {
 	res.status(200).json({ success: true, data: user });
 });
 
+// @decs    Forgot password
+// @route   POST /api/v1/auth/reset-password
+// @access  Public
+exports.forgotPassword = asyncMiddleware(async (req, res, next) => {
+	const { email } = req.body;
+	const user = await User.findOne({ email });
+
+	if (!user) {
+		return next(new ErrorResponse(`User with email ${email} not found`, 404));
+	}
+
+	const resetPasswordToken = user.getResetPassword();
+
+	await user.save({ validateBeforeSave: false });
+
+	res.status(200).json({ success: true, data: user });
+});
+
 const sendTokenResponse = (user, statusCode, res) => {
 	const token = user.getSignedJWTToken();
 
