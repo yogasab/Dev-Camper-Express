@@ -8,9 +8,20 @@ const path = require("path");
 // @route   POST /api/v1/bootcamps
 // @access  Private
 exports.createBootcamp = asyncMiddleware(async (req, res, next) => {
-	const bootcamp = req.body;
-	const data = await Bootcamp.create(bootcamp);
-	res.status(201).json({ success: true, data: data });
+	req.body.user = req.user.id;
+
+	const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id });
+	if (publishedBootcamp && req.user.role !== "admin") {
+		return next(
+			new ErrorResponse(
+				`The user with ID of ${req.user.id} has published bootcamp`,
+				400
+			)
+		);
+	}
+	const bootcamp = await Bootcamp.create(req.body);
+
+	res.status(201).json({ success: true, data: bootcamp });
 });
 
 // @decs    Get all bootcamps

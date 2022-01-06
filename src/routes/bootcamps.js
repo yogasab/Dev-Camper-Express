@@ -26,7 +26,7 @@ router
 router
 	.route("/")
 	.get(advanceResponseMiddleware(Bootcamp, "courses"), getBootcamps)
-	.post(protect, authorize("publisher", "admin"), createBootcamp);
+	.post(protect, createBootcamp);
 
 router
 	.route("/:id")
