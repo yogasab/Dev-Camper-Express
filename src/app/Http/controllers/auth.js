@@ -127,6 +127,46 @@ exports.resetPassword = asyncMiddleware(async (req, res, next) => {
 	sendTokenResponse(user, 200, res);
 });
 
+// @decs    Update user name and email
+// @route   POST /api/v1/auth/update-details
+// @access  Private
+exports.updateUserDetails = asyncMiddleware(async (req, res, next) => {
+	const { id } = req.user;
+	const fields = {
+		name: req.body.name,
+		email: req.body.email,
+	};
+
+	const user = await User.findByIdAndUpdate(req.user.id, fields, {
+		new: true,
+		runValidators: true,
+	});
+
+	res
+		.status(200)
+		.json({ success: true, message: "User info successfully updated", user });
+});
+
+// @decs    Update user password
+// @route   POST /api/v1/auth/update-password
+// @access  Private
+exports.updatePassword = asyncMiddleware(async (req, res, next) => {
+	const { id } = req.user;
+	const { currentPassword, newPassword } = req.body;
+
+	const user = await User.findById(id);
+	if (!user) {
+		return next(new ErrorResponse(`User with id ${id} not found`, 401));
+	}
+	if (!(await user.matchPassword(currentPassword))) {
+		return next(new ErrorResponse(`Invalid credentials`, 401));
+	}
+	user.password = newPassword;
+	await user.save();
+
+	sendTokenResponse(user, 200, res);
+});
+
 const sendTokenResponse = (user, statusCode, res) => {
 	const token = user.getSignedJWTToken();
 
