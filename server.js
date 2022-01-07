@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const bootcamps = require("./src/routes/bootcamps");
 const courses = require("./src/routes/courses");
 const auth = require("./src/routes/auth");
+const users = require("./src/routes/users");
 const handleError = require("./src/app/Http/middleware/handleError");
 const connectDB = require("./env/db");
 
@@ -28,6 +29,7 @@ app.use(cookieParser());
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
 app.use("/api/v1/auth", auth);
+app.use("/api/v1/auth/users", users);
 
 // Handle Error Middleware
 app.use(handleError);
