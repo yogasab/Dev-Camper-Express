@@ -6,8 +6,8 @@ const {
 	getUser,
 	deleteUser,
 } = require("../../src/app/Http/controllers/users");
-const router = express.Router();
 const User = require("../app/Model/User");
+const router = express.Router();
 
 const advanceResponseMiddleware = require("../app/Http/middleware/advanceResponseMiddleware");
 const { protect, authorize } = require("../app/Http/middleware/auth");

@@ -44,6 +44,9 @@ exports.getUser = asyncMiddleware(async (req, res, next) => {
 	const { id } = req.params;
 
 	const user = await User.findById(id).select("-password");
+	if (!user) {
+		return next(new ErrorResponse(`User not found`, 404));
+	}
 
 	res.status(200).json({ success: true, user });
 });
