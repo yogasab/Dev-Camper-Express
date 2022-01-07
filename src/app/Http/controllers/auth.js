@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const ErrorResponse = require("../../../utils/ErrorResponse");
 const asyncMiddleware = require("../middleware/asyncMiddleware");
 const User = require("../../Model/User");
@@ -73,7 +74,7 @@ exports.forgotPassword = asyncMiddleware(async (req, res, next) => {
 	// Create reset URL
 	const resetURL = `${req.protocol}://${req.get(
 		"host"
-	)}/api/v1/auth/forgot-password/${resetPasswordToken}`;
+	)}/api/v1/auth/reset-password/${resetPasswordToken}`;
 	const message = `Your reset password is ${resetURL}`;
 
 	try {
@@ -97,6 +98,33 @@ exports.forgotPassword = asyncMiddleware(async (req, res, next) => {
 	await user.save({ validateBeforeSave: false });
 
 	res.status(200).json({ success: true, data: user });
+});
+
+// @decs    Forgot password
+// @route   POST /api/v1/auth/reset-password/:resetToken
+// @access  Public
+exports.resetPassword = asyncMiddleware(async (req, res, next) => {
+	const { resetToken } = req.params;
+
+	// Get hashed token
+	const resetPasswordToken = crypto
+		.createHash("sha256")
+		.update(resetToken)
+		.digest("hex");
+	// Find user by hashed token and expire token
+	const user = await User.findOne({
+		resetPasswordToken,
+		resetPasswordExpire: { $gt: Date.now() },
+	});
+	if (!user) {
+		return next(new ErrorResponse(`User not found`, 400));
+	}
+	user.password = req.body.password;
+	user.resetPassword = undefined;
+	user.resetPasswordExpire = undefined;
+	await user.save();
+
+	sendTokenResponse(user, 200, res);
 });
 
 const sendTokenResponse = (user, statusCode, res) => {
