@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const fileUpload = require("express-fileupload");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize");
 const bootcamps = require("./src/routes/bootcamps");
 const courses = require("./src/routes/courses");
 const auth = require("./src/routes/auth");
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(fileUpload());
 app.use(cookieParser());
+app.use(mongoSanitize());
 
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
