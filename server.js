@@ -5,6 +5,8 @@ const fileUpload = require("express-fileupload");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xss = require("xss-clean");
 const bootcamps = require("./src/routes/bootcamps");
 const courses = require("./src/routes/courses");
 const auth = require("./src/routes/auth");
@@ -25,9 +27,16 @@ connectDB();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+// File Upload
 app.use(fileUpload());
+// Cookie parser
 app.use(cookieParser());
+// SQL injector
 app.use(mongoSanitize());
+// Headers protection
+app.use(helmet());
+// XSS attack
+app.use(xss());
 
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
