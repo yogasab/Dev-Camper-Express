@@ -57,3 +57,52 @@ exports.createReview = asyncMiddleware(async (req, res, next) => {
 		.status(201)
 		.json({ success: true, message: "Review created successfully", review });
 });
+
+// @decs    Update review details
+// @route   PUT /api/v1/reviews/:id
+// @access  Private
+exports.updateReview = asyncMiddleware(async (req, res, next) => {
+	const { id } = req.params;
+
+	let review = await Review.findById(id);
+	if (!review) {
+		return next(new ErrorResponse(`Review not found`, 404));
+	}
+	// If the user is not the one who create and not an admin
+	if (review.user.toString() !== req.user.id && req.user.role !== "admin") {
+		return next(
+			new ErrorResponse(`You are not authorized to update review`, 401)
+		);
+	}
+	review = await Review.findByIdAndUpdate(id, req.body, {
+		new: true,
+		runValidators: true,
+	});
+	review.save();
+
+	res
+		.status(200)
+		.json({ success: true, message: "Reviews updated successfully", review });
+});
+
+// @decs    Update review details
+// @route   PUT /api/v1/reviews/:id
+// @access  Private
+exports.deleteReview = asyncMiddleware(async (req, res, next) => {
+	const { id } = req.params;
+
+	let review = await Review.findById(id);
+	if (!review) {
+		return next(new ErrorResponse(`Review not found`, 404));
+	}
+	if (review.user.toString() !== req.user.id && req.user.role !== "admin") {
+		return nex(
+			new ErrorResponse(`You are not authorized to update review`, 401)
+		);
+	}
+	await review.remove();
+
+	res
+		.status(200)
+		.json({ success: true, message: "Review deleted successfully" });
+});
