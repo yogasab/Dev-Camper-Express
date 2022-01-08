@@ -7,6 +7,9 @@ const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet");
 const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
+const cors = require("cors");
 const bootcamps = require("./src/routes/bootcamps");
 const courses = require("./src/routes/courses");
 const auth = require("./src/routes/auth");
@@ -37,6 +40,16 @@ app.use(mongoSanitize());
 app.use(helmet());
 // XSS attack
 app.use(xss());
+// Setting rate limit for amount of request
+const limiter = rateLimit({
+	windowMs: 1 * 60 * 1000,
+	max: 3,
+});
+app.use(limiter);
+// HPP attack
+app.use(hpp());
+// CORS Attack
+app.use(cors());
 
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
